@@ -1,3 +1,7 @@
-api:
-    resource: "@ApiBundle/Resources/config/routing.yml"
-    prefix:   /
+album:
+    type: rest
+    resource: "@ApiBundle/Resources/config/album_routes.yml"
+
+NelmioApiDocBundle:
+    resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
+    prefix:   /api/doc

@@ -1,3 +1,4 @@
-api_homepage:
-    path:     /
-    defaults: { _controller: ApiBundle:Default:index }
+album:
+    type: rest
+    host:   localhost
+    resource: "album_routes.yml"

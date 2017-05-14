@@ -11,12 +11,15 @@ namespace GalerijaREST\ApiBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\Annotation\Type;
 
 /**
  * Album
  *
  * @ORM\Table()
  * @ORM\Entity
+ * @Serializer\AccessorOrder("custom", custom = {"id"})
  */
 class Album
 {
@@ -48,6 +51,7 @@ class Album
      *
      * @ORM\JoinColumn(nullable=true)
      * @ORM\OneToOne(targetEntity="GalerijaREST\ApiBundle\Entity\Image")
+     * @Serializer\Exclude()
      */
     private $coverPhoto;
 
@@ -56,6 +60,7 @@ class Album
      *
      * @ORM\OneToMany(targetEntity="\GalerijaREST\ApiBundle\Entity\Image", mappedBy="album")
      * @ORM\OrderBy({"id" = "ASC"})
+     * @Type("Relation")
      */
     private $images;
 
@@ -63,6 +68,7 @@ class Album
      * @var User
      *
      * @ORM\ManyToOne(targetEntity="User", inversedBy="albums")
+     * @Serializer\Exclude()
      */
     private $user;
 
@@ -222,5 +228,23 @@ class Album
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * @Serializer\VirtualProperty()
+     * @Serializer\SerializedName("user")
+     */
+    public function getUserId()
+    {
+        return $this->user->getId();
+    }
+
+    /**
+     * @Serializer\VirtualProperty()
+     * @Serializer\SerializedName("cover_photo")
+     */
+    public function getCoverPhotoId()
+    {
+        return $this->coverPhoto === null ? $this->coverPhoto : $this->coverPhoto->getId();
     }
 }

@@ -1,0 +1,13 @@
+album:
+    type:     rest
+    resource: GalerijaREST\ApiBundle\Controller\AlbumController
+    defaults: {_format: json}
+
+images:
+    type:         rest
+    resource:     GalerijaREST\ApiBundle\Controller\ImageController
+
+album_images:
+    parent:   album
+    type:         rest
+    resource:     GalerijaREST\ApiBundle\Controller\AlbumImageController
