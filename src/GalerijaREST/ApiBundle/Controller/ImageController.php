@@ -154,9 +154,9 @@ class ImageController extends FOSRestController
      * @param Image $image
      *
      * @Annotations\RequestParam(name="name", nullable=true, strict=true, requirements="^(?!null).+", description="File name.")
-     * @Annotations\RequestParam(name="album", nullable=true, strict=true, requirements="^(?!null).+", description="Album id.")
-     * @Annotations\RequestParam(name="user", nullable=true, strict=true, requirements="^(?!null).+", description="User id.")
-     * @Annotations\RequestParam(name="description", nullable=true, strict=true, description="Cover photo id.", default="No description")
+     * @Annotations\RequestParam(name="album", nullable=true, strict=true, requirements="[0-9]+", description="Album id.")
+     * @Annotations\RequestParam(name="user", nullable=true, strict=true, requirements="[0-9]+", description="User id.")
+     * @Annotations\RequestParam(name="description", nullable=true, strict=true, description="Description about image.", default="No description")
      * @Annotations\RequestParam(name="image_data", nullable=true, strict=true, requirements="^(?!null).+", description="Image data in base64.")
      *
      * @ParamConverter("image", class="ApiBundle:Image", options={"id": "image"})
@@ -192,8 +192,8 @@ class ImageController extends FOSRestController
      * @param Album $album
      *
      * @Annotations\RequestParam(name="name", nullable=true, strict=true, requirements="^(?!null).+", description="File name.")
-     * @Annotations\RequestParam(name="user", nullable=true, strict=true, requirements="^(?!null).+|[0-9]+", description="User id.")
-     * @Annotations\RequestParam(name="description", nullable=true, strict=true, description="Cover photo id.", default="No description")
+     * @Annotations\RequestParam(name="user", nullable=true, strict=true, requirements="[0-9]+", description="User id.")
+     * @Annotations\RequestParam(name="description", nullable=true, strict=true, description="Description about image.", default="No description")
      * @Annotations\RequestParam(name="image_data", nullable=true, strict=true, requirements="^(?!null).+", description="Image data in base64.")
      *
      * @ParamConverter("image", class="ApiBundle:Image", options={"id": "image"})
@@ -234,7 +234,7 @@ class ImageController extends FOSRestController
      *
      * @Annotations\RequestParam(name="name", nullable=false, strict=true, description="File name.")
      * @Annotations\RequestParam(name="user", nullable=false, strict=true, requirements="[0-9]+", description="User id.")
-     * @Annotations\RequestParam(name="description", nullable=true, strict=true, description="Cover photo id.", default="No description")
+     * @Annotations\RequestParam(name="description", nullable=true, strict=true, description="Description about image.", default="No description")
      * @Annotations\RequestParam(name="image_data", nullable=false, strict=true, description="Image data in base64.")
      *
      * @return Image

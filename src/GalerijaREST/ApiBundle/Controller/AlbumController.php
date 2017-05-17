@@ -120,7 +120,7 @@ class AlbumController extends FOSRestController
      * @param Album $album
      *
      * @Annotations\RequestParam(name="title", nullable=false, strict=true, description="Title.")
-     * @Annotations\RequestParam(name="user", nullable=true, strict=true, description="User id.")
+     * @Annotations\RequestParam(name="user", nullable=true, strict=true, requirements="[0-9]+", description="User id.")
      * @Annotations\RequestParam(name="cover_photo", nullable=true, strict=true, description="Cover photo id.")
      *
      * @ParamConverter("album", class="ApiBundle:Album", options={"id": "album"})
