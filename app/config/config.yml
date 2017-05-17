@@ -89,9 +89,9 @@ fos_rest:
             json: true
         templating_formats:
             html: true
-    format_listener:
-        rules:
-            - { path: ^/, priorities: [ html, json, xml ], fallback_format: json, prefer_extension: true }
+    routing_loader:
+        default_format: json
+        include_format: false
     versioning:
         enabled: true
         resolvers:

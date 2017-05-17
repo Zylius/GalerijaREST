@@ -63,7 +63,7 @@ class CommentController extends FOSRestController
      * @param ParamFetcher $paramFetcher Paramfetcher
      * @param Image $image
      *
-     * @Annotations\RequestParam(name="comment", nullable=false, strict=true, description="Comment submitted.")
+     * @Annotations\RequestParam(name="comment_text", nullable=false, strict=true, description="Comment submitted.")
      * @Annotations\RequestParam(name="user", nullable=false, strict=true, requirements="[0-9]+", description="User id.")
      *
      * @return Comment
@@ -99,29 +99,33 @@ class CommentController extends FOSRestController
      *
      * @param ParamFetcher $paramFetcher Paramfetcher
      *
-     * @param Comment $commentInstance
+     * @param Comment $comment
      * @param Image $image
      *
      * @Annotations\RequestParam(name="user", nullable=true, strict=true, requirements="[0-9]+", description="User id.")
-     * @Annotations\RequestParam(name="comment", nullable=true, strict=true, requirements="^(?!null).+", description="Comment data in base64.")
+     * @Annotations\RequestParam(name="comment_text", nullable=true, strict=true, requirements="^(?!null).+", description="Comment text.")
      *
-     * @ParamConverter("commentInstance", class="ApiBundle:Comment", options={"id": "commentInstance"})
+     * @ParamConverter("comment", class="ApiBundle:Comment", options={"id": "comment"})
      * @ParamConverter("image", class="ApiBundle:Image", options={"id": "image"})
      *
      * @return Comment
      *
      * @throws NotFoundHttpException when comment does not exist.
      */
-    public function putImageCommentAction(ParamFetcher $paramFetcher, Image $image = null, Comment $commentInstance)
+    public function putImageCommentAction(ParamFetcher $paramFetcher, Image $image, Comment $comment)
     {
-        $image && $commentInstance->setImage($image);
-        $paramFetcher->get('user') && $commentInstance->setUser($this->getEntity('ApiBundle:User', $paramFetcher->get('user')));
-        $paramFetcher->get('comment') && $commentInstance->setComment($paramFetcher->get('comment'));
+        if ($image !== $comment->getImage()) {
+            throw new NotFoundHttpException("Comment {$comment->getId()} not found in image {$image->getId()}");
+        }
 
-        $this->getDoctrine()->getManager()->persist($commentInstance);
+        $image && $comment->setImage($image);
+        $paramFetcher->get('user') && $comment->setUser($this->getEntity('ApiBundle:User', $paramFetcher->get('user')));
+        $paramFetcher->get('comment') && $comment->setComment($paramFetcher->get('comment'));
+
+        $this->getDoctrine()->getManager()->persist($comment);
         $this->getDoctrine()->getManager()->flush();
 
-        return $commentInstance;
+        return $comment;
     }
 
     /**

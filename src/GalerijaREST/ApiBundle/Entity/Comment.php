@@ -34,6 +34,7 @@ class Comment
      * @var string
      *
      * @ORM\Column(name="comment", type="string", length=255)
+     * @Serializer\SerializedName("comment_text")
      */
     private $comment;
 

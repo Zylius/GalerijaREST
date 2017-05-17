@@ -1,6 +1,6 @@
 album:
     type: rest
-    resource: "@ApiBundle/Resources/config/album_routes.yml"
+    resource: "@ApiBundle/Resources/config/routing.yml"
 
 NelmioApiDocBundle:
     resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
