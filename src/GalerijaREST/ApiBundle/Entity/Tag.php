@@ -9,12 +9,14 @@
 namespace GalerijaREST\ApiBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Tag
  *
  * @ORM\Table()
  * @ORM\Entity
+ * @Serializer\AccessorOrder("custom", custom = {"id"})
  */
 class Tag
 {
@@ -38,6 +40,7 @@ class Tag
      * @var Image
      *
      * @ORM\ManyToOne(targetEntity="Image", inversedBy="tags")
+     * @Serializer\Exclude()
      */
     private $image;
 
@@ -97,8 +100,15 @@ class Tag
         return $this->image;
     }
 
-    public function __toString()
+    /**
+     * @Serializer\VirtualProperty()
+     * @Serializer\SerializedName("image")
+     */
+    public function getImageId()
     {
-        return $this->name;
+        if ($this->image === null) {
+            return null;
+        }
+        return $this->image->getId();
     }
 }
