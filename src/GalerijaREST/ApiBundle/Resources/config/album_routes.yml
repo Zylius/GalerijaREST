@@ -3,11 +3,11 @@ album:
     resource: GalerijaREST\ApiBundle\Controller\AlbumController
     defaults: {_format: json}
 
+
 images:
     type:         rest
     resource:     GalerijaREST\ApiBundle\Controller\ImageController
 
-album_images:
-    parent:   album
+comments:
     type:         rest
-    resource:     GalerijaREST\ApiBundle\Controller\AlbumImageController
+    resource:     GalerijaREST\ApiBundle\Controller\CommentController

@@ -77,6 +77,7 @@ class Album
      */
     public function __construct()
     {
+        $this->createdOn = new \DateTime();
         $this->images = new ArrayCollection();
     }
 
@@ -236,8 +237,12 @@ class Album
      */
     public function getUserId()
     {
+        if ($this->user === null) {
+            return null;
+        }
         return $this->user->getId();
     }
+
 
     /**
      * @Serializer\VirtualProperty()
@@ -245,6 +250,9 @@ class Album
      */
     public function getCoverPhotoId()
     {
-        return $this->coverPhoto === null ? $this->coverPhoto : $this->coverPhoto->getId();
+        if ($this->coverPhoto === null) {
+            return null;
+        }
+        return $this->coverPhoto->getId();
     }
 }
