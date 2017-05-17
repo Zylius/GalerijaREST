@@ -10,7 +10,8 @@ namespace GalerijaREST\ApiBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -43,7 +44,6 @@ class Image
      * @var string
      *
      * @ORM\Column(name="description", type="string", length=255)
-     * @Assert\NotBlank
      */
     private $description;
 
@@ -52,6 +52,7 @@ class Image
      *
      * @ORM\OneToMany(targetEntity="Tag", mappedBy="image")
      * @ORM\OrderBy({"id" = "ASC"})
+     * @Serializer\Type("Relation")
      */
     private $tags;
 
@@ -60,6 +61,7 @@ class Image
      *
      * @ORM\OneToMany(targetEntity="\GalerijaREST\ApiBundle\Entity\Comment", mappedBy="image")
      * @ORM\OrderBy({"id" = "ASC"})
+     * @Serializer\Type("Relation")
      */
     private $comments;
 
@@ -67,6 +69,7 @@ class Image
      * @var User
      *
      * @ORM\ManyToOne(targetEntity="\GalerijaREST\ApiBundle\Entity\User", inversedBy="images")
+     * @Serializer\Exclude()
      */
     private $user;
 
@@ -75,23 +78,24 @@ class Image
      *
      * @ORM\JoinColumn(nullable=false)
      * @ORM\ManyToOne(targetEntity="\GalerijaREST\ApiBundle\Entity\Album", inversedBy="images")
+     * @Serializer\Type("Relation")
+     * @Serializer\Exclude()
      */
     private $album;
 
     /**
-     * @Assert\File(
-     *     maxSizeMessage = "Paveikslėlis negali būti didesnis nei 5mB",
-     *     maxSize = "5000k",
-     *     mimeTypes = {"image/jpg", "image/jpeg", "image/gif", "image/png"},
-     *     mimeTypesMessage = "Netinkamas nuotraukos tipas, turi būti JPG, PNG arba GIF"
-     * )
+     *  @var string
+     *
+     * @ORM\Column(name="data", type="text")
+     * @Serializer\SerializedName("image_data")
+     * @Assert\NotBlank
      */
-    private $file;
+    private $data;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $path;
+    private $extension;
 
     /**
      * Constructor
@@ -225,129 +229,52 @@ class Image
     }
 
     /**
-     * Returns uploaded file.
-     *
-     * @return UploadedFile
-     */
-    public function getFile()
-    {
-        return $this->file;
-    }
-
-    /**
      * Sets file.
      *
-     * @param UploadedFile $file
+     * @param string $data
+     *
+     * @throws \HttpInvalidParamException
      */
-    public function setFile(UploadedFile $file = null)
+    public function setData(string $data)
     {
-        $this->file = $file;
-        // check if we have an old image path
-        if (isset($this->path)) {
-            // store the old name to delete after the update
-            $this->temp = $this->path;
-            $this->path = null;
-        } else {
-            $this->path = 'initial';
+        $data = trim($data);
+        $extension = $this->checkExtension($data);
+        if (!$extension) {
+            throw new BadRequestHttpException("Image data parameter was invalid.");
         }
+        $this->extension = $extension;
+        $this->data = $data;
     }
 
     /**
-     * Sets path for this upload.
+     * Checks extension of the base64 data.
      *
-     * @ORM\PrePersist()
-     * @ORM\PreUpdate()
+     * @param $data
+     *
+     * @return bool|string
      */
-    public function preUpload()
-    {
-        if (null !== $this->getFile()) {
-            // do whatever you want to generate a unique name
-            $filename = sha1(uniqid(mt_rand(), true));
-            $this->path = $filename.'.'.$this->getFile()->guessExtension();
-        }
-    }
+    private function checkExtension($data){
+        $imageContents = base64_decode($data);
 
-    /**
-     * Moves file to the required dir.
-     *
-     * @ORM\PostPersist()
-     * @ORM\PostUpdate()
-     */
-    public function upload()
-    {
-        if (null === $this->getFile()) {
-            return;
+        // If its not base64 end processing and return false
+        if ($imageContents === false) {
+            return false;
         }
 
-        // if there is an error when moving the file, an exception will
-        // be automatically thrown by move(). This will properly prevent
-        // the entity from being persisted to the database on error
-        $this->getFile()->move($this->getUploadRootDir(), $this->path);
+        $validExtensions = ['png', 'jpeg', 'jpg', 'gif'];
 
-        // check if we have an old image
-        if (isset($this->temp)) {
-            // delete the old image
-            unlink($this->getUploadRootDir().'/'.$this->temp);
-            // clear the temp image path
-            $this->temp = null;
+
+        if (substr($data, 0, 11) !== 'data:image/') {
+            return false;
         }
-        $this->file = null;
-    }
 
-    /**
-     * @ORM\PostRemove()
-     */
-    public function removeUpload()
-    {
-        $file = $this->getAbsolutePath();
-        if ($file) {
-            unlink($file);
+        $extension = strtok(str_replace('data:image/', '', $data), ';');
+
+        if (!in_array(strtolower($extension), $validExtensions)) {
+            return false;
         }
-    }
 
-    /**
-     * Returns absolute image path.
-     *
-     * @return null|string
-     */
-    public function getAbsolutePath()
-    {
-        return null === $this->path
-            ? null
-            : $this->getUploadRootDir().'/'.$this->path;
-    }
-
-    /**
-     * Returns web path for the image.
-     *
-     * @return null|string
-     */
-    public function getWebPath()
-    {
-        return null === $this->path
-            ? null
-            : $this->getUploadDir().'/'.$this->path;
-    }
-
-    /**
-     * The absolute directory path where uploaded documents should be saved.
-     *
-     * @return string
-     */
-    protected function getUploadRootDir()
-    {
-
-        return __DIR__.'/../../../../web/'.$this->getUploadDir();
-    }
-
-    /**
-     * Get rid of the __DIR__ so it doesn't screw up when displaying uploaded doc/image in the view.
-     *
-     * @return string
-     */
-    protected function getUploadDir()
-    {
-        return 'uploads/documents';
+        return $extension;
     }
 
     /**
@@ -374,29 +301,6 @@ class Image
     }
 
     /**
-     * Set path
-     *
-     * @param string $path
-     * @return Image
-     */
-    public function setPath($path)
-    {
-        $this->path = $path;
-
-        return $this;
-    }
-
-    /**
-     * Get path
-     *
-     * @return string
-     */
-    public function getPath()
-    {
-        return $this->path;
-    }
-
-    /**
      * Set description
      *
      * @param string $description
@@ -417,5 +321,26 @@ class Image
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * @Serializer\VirtualProperty()
+     * @Serializer\SerializedName("album")
+     */
+    public function getAlbumId()
+    {
+        return $this->album->getId();
+    }
+
+    /**
+     * @Serializer\VirtualProperty()
+     * @Serializer\SerializedName("user")
+     */
+    public function getUserId()
+    {
+        if ($this->user === null) {
+            return null;
+        }
+        return $this->user->getId();
     }
 }
