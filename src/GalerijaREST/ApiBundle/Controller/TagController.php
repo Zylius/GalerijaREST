@@ -26,8 +26,12 @@ class TagController extends FOSRestController
      *
      * @QueryParam(name="page", requirements="\d+", default="1", description="Page of the overview.")
      *
-     * @ApiDoc()
-     */
+     * @ApiDoc(
+     *   output = "GalerijaREST\ApiBundle\Entity\Tag",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *   }
+     * )     */
     public function getTagsAction()
     {
         return $this->getDoctrine()->getRepository('ApiBundle:Tag')->findAll();
@@ -41,8 +45,14 @@ class TagController extends FOSRestController
      * @return array data
      *
      * @QueryParam(name="page", requirements="\d+", default="1", description="Page of the overview.")
-     * @ApiDoc()
-     */
+     *
+     * @ApiDoc(
+     *   output = "GalerijaREST\ApiBundle\Entity\Tag",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *     404 = "Returned when the image is not found"
+     *   }
+     * )     */
     public function getImageTagsAction(Image $image)
     {
         return $image->getTags();
@@ -54,7 +64,8 @@ class TagController extends FOSRestController
      * @ApiDoc(
      *   output = "GalerijaREST\ApiBundle\Entity\Tag",
      *   statusCodes = {
-     *     200 = "Returned when successful"
+     *     200 = "Returned when successful",
+     *     400 = "Returned when the data passed is incorrect"
      *   }
      * )
      *
@@ -89,6 +100,7 @@ class TagController extends FOSRestController
      *   output = "GalerijaREST\ApiBundle\Entity\Tag",
      *   statusCodes = {
      *     200 = "Returned when successful",
+     *     400 = "Returned when the data passed is incorrect",
      *     404 = "Returned when the tag is not found"
      *   }
      * )
@@ -165,7 +177,7 @@ class TagController extends FOSRestController
      *   output = "GalerijaREST\ApiBundle\Entity\Tag",
      *   statusCodes = {
      *     200 = "Returned when successful",
-     *     404 = "Returned when the note is not found"
+     *     404 = "Returned when the tag is not found"
      *   }
      * )
      *

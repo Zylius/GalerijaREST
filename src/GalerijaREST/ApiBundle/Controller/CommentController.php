@@ -26,7 +26,12 @@ class CommentController extends FOSRestController
      *
      * @QueryParam(name="page", requirements="\d+", default="1", description="Page of the overview.")
      *
-     * @ApiDoc()
+     * @ApiDoc(
+     *   output = "GalerijaREST\ApiBundle\Entity\Comment",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *   }
+     * )
      */
     public function getCommentsAction()
     {
@@ -41,7 +46,15 @@ class CommentController extends FOSRestController
      * @return array data
      *
      * @QueryParam(name="page", requirements="\d+", default="1", description="Page of the overview.")
-     * @ApiDoc()
+     *
+     *
+     * @ApiDoc(
+     *   output = "GalerijaREST\ApiBundle\Entity\Comment",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *     404 = "Returned when the image is not found"
+     *   }
+     * )
      */
     public function getImageCommentsAction(Image $image)
     {
@@ -49,12 +62,13 @@ class CommentController extends FOSRestController
     }
 
     /**
-     * Create a new comment for comment.
+     * Create a new comment for image.
      *
      * @ApiDoc(
      *   output = "GalerijaREST\ApiBundle\Entity\Comment",
      *   statusCodes = {
-     *     200 = "Returned when successful"
+     *     200 = "Returned when successful",
+     *     400 = "Returned when the data passed is incorrect",
      *   }
      * )
      *
@@ -91,6 +105,7 @@ class CommentController extends FOSRestController
      *   output = "GalerijaREST\ApiBundle\Entity\Comment",
      *   statusCodes = {
      *     200 = "Returned when successful",
+     *     400 = "Returned when the data passed is incorrect",
      *     404 = "Returned when the comment is not found"
      *   }
      * )
@@ -120,7 +135,7 @@ class CommentController extends FOSRestController
 
         $image && $comment->setImage($image);
         $paramFetcher->get('user') && $comment->setUser($this->getEntity('ApiBundle:User', $paramFetcher->get('user')));
-        $paramFetcher->get('comment') && $comment->setComment($paramFetcher->get('comment'));
+        $paramFetcher->get('comment_text') && $comment->setComment($paramFetcher->get('comment_text'));
 
         $this->getDoctrine()->getManager()->persist($comment);
         $this->getDoctrine()->getManager()->flush();
@@ -170,7 +185,7 @@ class CommentController extends FOSRestController
      *   output = "GalerijaREST\ApiBundle\Entity\Comment",
      *   statusCodes = {
      *     200 = "Returned when successful",
-     *     404 = "Returned when the note is not found"
+     *     404 = "Returned when the comment is not found"
      *   }
      * )
      *

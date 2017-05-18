@@ -23,13 +23,18 @@ class ImageController extends FOSRestController
     /**
      * Get the list of images by album.
      *
-     * @return array|Collection
+     * @return Image[]
      *
      * @param Album $album
      * @ParamConverter("album", class="ApiBundle:Album", options={"id": "album"})
      *
-     * @ApiDoc()
-     */
+     * @ApiDoc(
+     *   output = "GalerijaREST\ApiBundle\Entity\Image",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *     404 = "Returned when the album is not found"
+     *   }
+     * )     */
     public function getAlbumImagesAction(Album $album)
     {
         return $album->getImages();
@@ -38,12 +43,16 @@ class ImageController extends FOSRestController
     /**
      * Get the list of images.
      *
-     * @return array|Collection
+     * @return Image[]
      *
      * @QueryParam(name="page", requirements="\d+", default="1", description="Page of the overview.")
      *
-     * @ApiDoc()
-     */
+     * @ApiDoc(
+     *   output = "GalerijaREST\ApiBundle\Entity\Image",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *   }
+     * )     */
     public function getImagesAction()
     {
         return $this->getDoctrine()->getRepository('ApiBundle:Image')->findAll();
@@ -56,7 +65,7 @@ class ImageController extends FOSRestController
      *   output = "GalerijaREST\ApiBundle\Entity\Image",
      *   statusCodes = {
      *     200 = "Returned when successful",
-     *     404 = "Returned when the note is not found"
+     *     404 = "Returned when the image is not found in album"
      *   }
      * )
      *
@@ -88,7 +97,7 @@ class ImageController extends FOSRestController
      *   output = "GalerijaREST\ApiBundle\Entity\Image",
      *   statusCodes = {
      *     200 = "Returned when successful",
-     *     404 = "Returned when the note is not found"
+     *     404 = "Returned when the image is not found"
      *   }
      * )
      *
@@ -113,7 +122,8 @@ class ImageController extends FOSRestController
      * @ApiDoc(
      *   output = "GalerijaREST\ApiBundle\Entity\Image",
      *   statusCodes = {
-     *     200 = "Returned when successful"
+     *     200 = "Returned when successful",
+     *     400 = "Returned when the data passed is incorrect",
      *   }
      * )
      *
@@ -144,7 +154,8 @@ class ImageController extends FOSRestController
      *   output = "GalerijaREST\ApiBundle\Entity\Image",
      *   statusCodes = {
      *     200 = "Returned when successful",
-     *     404 = "Returned when the note is not found"
+     *     400 = "Returned when the data passed is incorrect",
+     *     404 = "Returned when the image is not found"
      *   }
      * )
      *
@@ -181,7 +192,8 @@ class ImageController extends FOSRestController
      *   output = "GalerijaREST\ApiBundle\Entity\Image",
      *   statusCodes = {
      *     200 = "Returned when successful",
-     *     404 = "Returned when the note is not found"
+     *     400 = "Returned when the data passed is incorrect",
+     *     404 = "Returned when the image is not found in album"
      *   }
      * )
      *
@@ -223,7 +235,8 @@ class ImageController extends FOSRestController
      * @ApiDoc(
      *   output = "GalerijaREST\ApiBundle\Entity\Image",
      *   statusCodes = {
-     *     200 = "Returned when successful"
+     *     200 = "Returned when successful",
+     *     400 = "Returned when the data passed is incorrect"
      *   }
      * )
      *
@@ -263,7 +276,7 @@ class ImageController extends FOSRestController
      *   output = "GalerijaREST\ApiBundle\Entity\Image",
      *   statusCodes = {
      *     204 = "Returned when successful",
-     *     404 = "Returned when the image is not found"
+     *     404 = "Returned when the image is not found in album"
      *   }
      * )
      *
@@ -310,7 +323,7 @@ class ImageController extends FOSRestController
      *
      * @return View
      *
-     * @throws NotFoundHttpException when album does not exist.
+     * @throws NotFoundHttpException when image does not exist.
      */
     public function deleteImageAction(Image $image)
     {

@@ -23,14 +23,13 @@ class AlbumController extends FOSRestController
     /**
      * Get the list of albums.
      *
-     * @param ParamFetcherInterface $paramFetcher
      *
      * @return array data
      *
      * @QueryParam(name="page", requirements="\d+", default="1", description="Page of the overview.")
      * @ApiDoc()
      */
-    public function getAlbumsAction(ParamFetcherInterface $paramFetcher)
+    public function getAlbumsAction()
     {
         return $this->getDoctrine()->getRepository('ApiBundle:Album')->findAll();
     }
@@ -48,20 +47,14 @@ class AlbumController extends FOSRestController
      *
      * @Annotations\View(templateVar="album")
      *
-     * @param int $id the album id
+     * @ParamConverter("album", class="ApiBundle:Album", options={"id": "album"})
      *
      * @return Album
      *
      * @throws NotFoundHttpException when album does not exist.
      */
-    public function getAlbumAction(int $id)
+    public function getAlbumAction(Album $album)
     {
-        /** @var Album  $album */
-        $album = $this->getDoctrine()->getRepository('ApiBundle:Album')->find($id);
-        if (false === $album) {
-            throw $this->createNotFoundException("Album does not exist.");
-        }
-
         return $album;
     }
 
@@ -71,8 +64,8 @@ class AlbumController extends FOSRestController
      * @ApiDoc(
      *   output = "GalerijaREST\ApiBundle\Entity\Album",
      *   statusCodes = {
-     *     200 = "Returned when successful",
-     *     404 = "Returned when the note is not found"
+     *     200 = "Returned when successfully created",
+     *     400 = "Returned when the data passed is incorrect",
      *   }
      * )
      *
@@ -109,8 +102,9 @@ class AlbumController extends FOSRestController
      * @ApiDoc(
      *   output = "GalerijaREST\ApiBundle\Entity\Album",
      *   statusCodes = {
-     *     200 = "Returned when successful",
-     *     404 = "Returned when the note is not found"
+     *     200 = "Returned when successfully edited",
+     *     400 = "Returned when the data passed is incorrect",
+     *     404 = "Returned when the album is not found",
      *   }
      * )
      *
@@ -145,10 +139,9 @@ class AlbumController extends FOSRestController
      * Delete an album.
      *
      * @ApiDoc(
-     *   output = "GalerijaREST\ApiBundle\Entity\Album",
      *   statusCodes = {
-     *     204 = "Returned when successful",
-     *     404 = "Returned when the note is not found"
+     *     204 = "Returned when successfully deleted",
+     *     404 = "Returned when the album is not found"
      *   }
      * )
      *
